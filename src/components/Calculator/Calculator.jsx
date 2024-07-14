@@ -18,7 +18,7 @@ export default function Calculator() {
     const handleSubmit = (event) => {
         event.preventDefault();
         dispatch(updateUser({ height, age, currentWeight, desiredWeight, bloodType }));
-        history('/profile'); // Asum că există o rută unde utilizatorul poate vedea profilul actualizat
+        history('/profile'); 
     };
 
     const handleLogout = () => {
