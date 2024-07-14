@@ -1,0 +1,35 @@
+.navbar {
+  width: 100%;
+  height: 20vh;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.logo {
+  position: relative;
+  width: 72px;
+  height: 66px;
+  background: url('../../images/logoSlimMom.jpg');
+  background-position: start;
+  background-repeat: no-repeat;
+  background-size: auto;
+  margin-left: 20px;
+}
+
+.logoTitle {
+  color: #9b9faa;
+  position: absolute;
+  color: #212121;
+  right: -100px;
+  bottom: -3px;
+}
+
+.logoColor {
+  color: #fc842d;
+}
+
+.link {
+  text-decoration: none;
+}
