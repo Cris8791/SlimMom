@@ -1,12 +1,14 @@
 //Src/Pages/LoginPage/LoginPage.jsx
-import Login  from 'components/Login/Login.jsx';
-import NavBar from 'components/NavBar/NavBar.jsx';
 import React from 'react';
-import styles from '../HomePage/Home.module.css';
+import NavBar from 'components/NavBar/NavBar.jsx';
 
-export const LoginPage = () => {
+
+import Login from 'components/Login/Login.jsx';
+import styles from './LoginPage.module.css';
+
+export default function LoginPage() {
   return (
-    <div className={styles.homepage}>
+    <div className={styles.loginpage}>
       <NavBar />
       <Login />
     </div>

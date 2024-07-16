@@ -6,7 +6,7 @@ import { Box, FormControl, Typography, TextField, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
 import {
-  getCurrentUser,
+ 
   registerUser,
 } from 'components/Redux/authSlice/authSlice.js';
 
@@ -26,9 +26,9 @@ const Registration = () => {
     e.preventDefault();
     try {
       await dispatch(registerUser(formData));
-      await dispatch(getCurrentUser());
+
       setFormData({ name: '', email: '', password: '' });
-      navigate('/calc');
+      navigate('/calculator');
     } catch (error) {
       setError(error.message);
     }
@@ -65,6 +65,7 @@ const Registration = () => {
               flexDirection: 'column',
               gap: '40px',
               paddingLeft: '20px',
+
               '@media screen and (max-width: 450px)': {
                 maxWidth: '300px',
               },

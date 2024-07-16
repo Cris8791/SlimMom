@@ -1,7 +1,7 @@
 // Src/components/IntakeCalories/IntakeCalories.jsx
 import React, { useState } from 'react';
 import css from './IntakeCalories.module.css';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import {
   Box,
   FormControl,
@@ -13,11 +13,7 @@ import {
   Button,
 } from '@mui/material';
 import IntakeModal from 'components/IntakeModal/IntakeModal';
-import {
-  updateUser,
-  fetchGetProducts,
-  getName,
-} from '../Redux/authSlice/authSlice';
+// import updateUser from '../Redux/authSlice/authSlice.js';
 
 const IntakeCalories = () => {
   const [open, setOpen] = useState(false);
@@ -29,7 +25,7 @@ const IntakeCalories = () => {
     bloodType: '',
   });
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const handleOpen = () => {
     setOpen(true);
@@ -50,14 +46,14 @@ const IntakeCalories = () => {
     console.log('Form submitted with data:', formData);
 
     try {
-      const updateResult = await dispatch(updateUser(formData)).unwrap();
-      console.log('User update result:', updateResult);
+      // const updateResult = await dispatch(updateUser(formData)).unwrap();
+      // console.log('User update result:', updateResult);
 
-      const productsResult = await dispatch(fetchGetProducts()).unwrap();
-      console.log('Fetched products:', productsResult);
+      // const productsResult = await dispatch(fetchGetProducts()).unwrap();
+      // console.log('Fetched products:', productsResult);
 
-      const nameResult = await dispatch(getName()).unwrap();
-      console.log('Fetched name:', nameResult);
+      // const nameResult = await dispatch(getName()).unwrap();
+      // console.log('Fetched name:', nameResult);
 
       setOpen(false);
       setFormData({
@@ -80,7 +76,7 @@ const IntakeCalories = () => {
           height: '80vh',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-end',
+          alignItems: 'baseline',
           justifyContent: 'space-evenly',
           gap: '15px',
         }}

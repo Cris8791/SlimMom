@@ -1,0 +1,7 @@
+.loginpage {
+  width: 100%;
+  min-height: 100vh; /* Asigură că pagina ocupă întreaga înălțime a viewport-ului */
+  background: url('../../images/homeSlim.png') right/ contain no-repeat,
+    url('../../images/vectorSlim.png') right / contain no-repeat;
+
+}

@@ -33,11 +33,15 @@ const Login = () => {
 
       if (action.payload) {
         console.log('Login successful, payload:', action.payload);
-        const { token } = action.payload;
+        const { token, user } = action.payload;
         if (token) {
           console.log('Token found:', token);
           localStorage.setItem('token', token);
-          navigate('/calc', { state: { token } });
+          if (user.height && user.currentWeight && user.desiredWeight && user.bloodType) {
+            navigate('/diary');
+          } else {
+            navigate('/calculator');
+          }
         } else {
           throw new Error('No token in response');
         }
@@ -59,6 +63,7 @@ const Login = () => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-evenly',
+          gap: '20px'
         }}
       >
         <Typography
@@ -72,7 +77,7 @@ const Login = () => {
             color: '#FC842D',
           }}
         >
-          Register
+          Login
         </Typography>
         <form onSubmit={handleSubmit}>
           <FormControl
@@ -179,7 +184,9 @@ const Login = () => {
                 </Typography>
               </Button>
               <Button
-                style={{
+                component={Link}
+                to="/registration"
+                sx={{
                   boxShadow: '0 4px 10px 0 rgba(252, 132, 45, 0.5)',
                   background: ' #fc842d',
                   borderRadius: '30px',
@@ -192,9 +199,7 @@ const Login = () => {
                     backgroundColor: '#fc842d',
                   },
                 }}
-                component={Link}
-                to="/login"
-              >
+>
                 <Typography
                   sx={{
                     textTransform: 'none',

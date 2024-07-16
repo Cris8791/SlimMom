@@ -1,259 +1,108 @@
-//Src/components/Diary/Diary.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './Diary.module.css';
 import {
   Typography,
   Box,
-  /* Button, */ List,
+  List,
   Fab,
-  FormControl,
   TextField,
-  MenuList,
-  Autocomplete,
+  MenuItem,
+  CircularProgress,
 } from '@mui/material';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import CloseIcon from '@mui/icons-material/Close';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import AddIcon from '@mui/icons-material/Add';
-import { useSelector } from 'react-redux';
 
 export default function Diary() {
-  const authState = useSelector(state => state.auth);
-  const user = authState.user && authState.user.data;
-  const allowedProductsAll = user?.infouser?.allowedProductsAll;
-  console.log('allowedProductsAll:', allowedProductsAll);
+  const user = useSelector(state => state.auth.user?.data);
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState('');
+  const [newGrams, setNewGrams] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const renderProductList = () => {
-    return allowedProductsAll.map((product, index) => (
-      <MenuList
-        key={`${product._id}-${index}`}
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '20px',
-          fontFamily: 'Verdana, sans-serif',
-          fontWeight: '400',
-          fontSize: '14px',
-          letterSpacing: '0.04em',
-          color: '#212121',
-        }}
-      >
-        <li>
-          <p className={styles.listStyle}>{product.title}</p>
-        </li>
+  useEffect(() => {
+    setIsLoading(true);
+    if (user && user.infouser && user.infouser.allowedProductsAll) {
+      setProducts(user.infouser.allowedProductsAll);
+    }
+    setIsLoading(false);
+  }, [user]);
 
-        <li className={styles.productInfo}>
-          <p className={styles.listStyle}>{product.weight} g</p>
-          <p className={styles.listStyle}> {product.calories} kcal</p>
-          <CloseRoundedIcon
-            sx={{ color: '#9B9FAA', fontSize: 'medium', cursor: 'pointer' }}
-          />
-        </li>
-      </MenuList>
-    ));
+  const handleAddProduct = () => {
+    if (newProduct && newGrams) {
+      const product = products.find(p => p.title === newProduct);
+      if (product) {
+        setProducts([...products, { ...product, weight: parseInt(newGrams) }]);
+        setNewProduct('');
+        setNewGrams('');
+      }
+    }
   };
+
+  const handleRemoveProduct = (index) => {
+    const updatedProducts = products.filter((_, i) => i !== index);
+    setProducts(updatedProducts);
+  };
+
+  if (isLoading) {
+    return <CircularProgress />;
+  }
+
+  if (!user) {
+    return <Typography>Vă rugăm să vă autentificați pentru a vedea jurnalul.</Typography>;
+  }
 
   return (
     <div className={styles.diary}>
-      <Box
-        sx={{
-          padding: '40px 0 0 20px',
-          alignItems: 'center',
-          display: 'flex',
-          flexDirection: 'row',
-          gap: '20px',
-          marginBottom: '-50px',
-        }}
-      >
-        <Typography
-          sx={{
-            fontFamily: 'Verdana, sans-serif',
-            fontWeight: '700',
-            fontSize: '34px',
-            textAlign: 'center',
-            color: '#212121',
-          }}
-        >
-          13.08.2023
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h5" component="h2">
+          {new Date().toLocaleDateString()}
         </Typography>
-        <DateRangeIcon sx={{ color: '#9B9FAA', fontSize: 'medium' }} />
+        <DateRangeIcon sx={{ ml: 1, color: 'text.secondary' }} />
       </Box>
-      <MenuList
-        sx={{
-          padding: '0 20px 0 20px',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '-50px',
-        }}
-      >
-        <li>
-          <Autocomplete
-            id="products"
-            sx={{
-              width: '380px',
-            }}
-            options={allowedProductsAll}
-            autoHighlight
-            getOptionLabel={option =>
-              option && option.title ? option.title : ''
-            }
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                {option.title}
-              </Box>
-            )}
-            renderInput={params => (
-              <TextField
-                {...params}
-                variant="standard"
-                placeholder="Enter product name"
-                autoComplete="off"
-                sx={{
-                  width: '380px',
-                  fontFamily: 'Verdana, sans-serif',
-                  fontWeight: '700',
-                  fontSize: '14px',
-                  lineHeight: '0.4',
-                  textAlign: 'center',
-                  color: '#9B9FAA',
 
-                  '& .MuiInput-underline:before': {
-                    borderBottomColor: '#9B9FAA',
-                    maxWidth: '380px',
-                  },
-                  '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                    borderBottomColor: '#9B9FAA',
-                    maxWidth: '380px',
-                  },
-                  '& .MuiInput-underline:after': {
-                    borderBottomColor: '#FC842D',
-                    maxWidth: '380px',
-                  },
-                }}
-                name="product"
-                disableunderline="true"
-                inputProps={{
-                  style: {
-                    fontFamily: 'Verdana, sans-serif',
-                    fontWeight: '400',
-                    fontSize: '14px',
-                    letterSpacing: '0.04em',
-                    color: '#212121',
-                  },
-                  ...params.inputProps,
-                  autoComplete: 'new-password', // disable autocomplete and autofill
-                }}
-              />
-            )}
-          />
-        </li>
-        <li className={styles.productInfo}>
-          <FormControl
-            sx={{
-              '@media screen and (max-width: 450px)': {
-                maxWidth: '300px',
-              },
-            }}
-          >
-            <TextField
-              variant="standard"
-              placeholder="Grams"
-              autoComplete="off"
-              sx={{
-                maxWidth: '70px',
-                fontFamily: 'Verdana, sans-serif',
-                fontWeight: '700',
-                fontSize: '14px',
-                lineHeight: '0.4',
-                textAlign: 'end',
-                color: '#9B9FAA',
-
-                '& .MuiInput-underline:before': {
-                  borderBottomColor: '#9B9FAA',
-                  maxWidth: '70px',
-                },
-                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                  borderBottomColor: '#9B9FAA',
-                  maxWidth: '70px',
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottomColor: '#FC842D',
-                  maxWidth: '70px',
-                },
-              }}
-              name="grams"
-              disableunderline="true"
-            />
-          </FormControl>
-          <Fab
-            size="small"
-            className={styles.mediaBtn}
-            sx={{
-              bgcolor: '#FC842D',
-              color: '#FFFFFF',
-              '&:hover': {
-                bgcolor: '#FC842D',
-                color: '#FFFFFF',
-              },
-            }}
-          >
-            <AddIcon fontSize="smaller" />
-          </Fab>
-        </li>
-      </MenuList>
-      <Box
-        sx={{
-          position: 'relative',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            height: '50px',
-            background:
-              'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1)) 80%',
-            zIndex: 1,
-          },
-        }}
-      >
-        <List
-          className={styles.box}
-          sx={{
-            width: '100%',
-            bgcolor: 'background.paper',
-            overflow: 'auto',
-            maxHeight: 220,
-            position: 'relative',
-            '&::-webkit-scrollbar': {
-              width: '7px',
-              backgroundColor: '#F0F1F3',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#264061',
-              borderRadius: '10px',
-            },
-            '& ul': { padding: 0 },
-          }}
-          subheader={<li />}
+      <Box sx={{ display: 'flex', mb: 2 }}>
+        <TextField
+          select
+          label="Produs"
+          value={newProduct}
+          onChange={(e) => setNewProduct(e.target.value)}
+          sx={{ mr: 1, minWidth: 200 }}
         >
-          <MenuList
-            sx={{
-              marginLeft: '20px',
-              width: '560px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-              listStyle: 'none',
-            }}
-          >
-            {renderProductList()}
-          </MenuList>
-        </List>
+          {products.map((product) => (
+            <MenuItem key={product._id} value={product.title}>
+              {product.title}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label="Grame"
+          type="number"
+          value={newGrams}
+          onChange={(e) => setNewGrams(e.target.value)}
+          sx={{ mr: 1, width: 100 }}
+        />
+        <Fab color="primary" size="small" onClick={handleAddProduct}>
+          <AddIcon />
+        </Fab>
       </Box>
+
+      <List sx={{ maxHeight: 300, overflow: 'auto' }}>
+        {products.map((product, index) => (
+          <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Typography>{product.title}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography sx={{ mr: 1 }}>{product.weight}g</Typography>
+              <Typography sx={{ mr: 1 }}>{product.calories * (product.weight / 100)} kcal</Typography>
+              <CloseIcon
+                onClick={() => handleRemoveProduct(index)}
+                sx={{ cursor: 'pointer', color: 'text.secondary' }}
+              />
+            </Box>
+          </Box>
+        ))}
+      </List>
     </div>
   );
-};
+}
