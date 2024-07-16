@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import css from './Login.module.css';
 import { useDispatch } from 'react-redux';
 import { Box, FormControl, Typography, TextField, Button } from '@mui/material';
-import { loginUser } from '../Redux/authSlice/authSlice.js';
+import { loginUser, fetchUserData } from '../Redux/authSlice/authSlice.js';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
@@ -27,18 +27,15 @@ const Login = () => {
     setError(null);
 
     try {
-      console.log('Attempting login with:', { email, password });
       const action = await dispatch(loginUser({ email, password }));
-      console.log('Action returned by dispatch:', action);
-
       if (action.payload) {
-        console.log('Login successful, payload:', action.payload);
-        const { token, user } = action.payload;
+        const { token } = action.payload;
         if (token) {
-          console.log('Token found:', token);
           localStorage.setItem('token', token);
-          // Verificăm dacă avem datele necesare pentru utilizator
-          if (user && user.height && user.currentWeight && user.desiredWeight && user.bloodType) {
+          // Așteptăm încărcarea datelor utilizatorului înainte de a naviga
+          await dispatch(fetchUserData());
+          const user = action.payload;
+          if (user.height && user.currentWeight && user.desiredWeight && user.bloodType) {
             navigate('/diary');
           } else {
             navigate('/calculator');

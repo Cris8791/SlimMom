@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styles from './Diary.module.css';
 import {
   Typography,
@@ -13,13 +13,23 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import AddIcon from '@mui/icons-material/Add';
+import { fetchUserData } from '../Redux/authSlice/authSlice'; // Presupunem că avem această acțiune
 
 export default function Diary() {
-  const user = useSelector(state => state.auth.user?.data);
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.auth.user);
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState('');
   const [newGrams, setNewGrams] = useState('');
+  const error = useSelector(state => state.auth.error);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (isLoggedIn && (!user || !user.height || !user.currentWeight || !user.desiredWeight || !user.bloodType)) {
+      dispatch(fetchUserData());
+    }
+  }, [isLoggedIn, user, dispatch]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -29,11 +39,15 @@ export default function Diary() {
     setIsLoading(false);
   }, [user]);
 
+  useEffect(() => {
+    console.log('User data in Diary:', user);
+  }, [user]);
+
   const handleAddProduct = () => {
     if (newProduct && newGrams) {
       const product = products.find(p => p.title === newProduct);
       if (product) {
-        setProducts([...products, { ...product, weight: parseInt(newGrams) }]);
+        setProducts(prevProducts => [...prevProducts, { ...product, weight: parseInt(newGrams) }]);
         setNewProduct('');
         setNewGrams('');
       }
@@ -41,17 +55,24 @@ export default function Diary() {
   };
 
   const handleRemoveProduct = (index) => {
-    const updatedProducts = products.filter((_, i) => i !== index);
-    setProducts(updatedProducts);
+    setProducts(prevProducts => prevProducts.filter((_, i) => i !== index));
   };
 
   if (isLoading) {
     return <CircularProgress />;
   }
 
-  if (!user) {
+  if (error) {
+    return <Typography color="error">Eroare la încărcarea datelor: {error}</Typography>;
+  }
+
+  if (!isLoggedIn) {
     return <Typography>Vă rugăm să vă autentificați pentru a vedea jurnalul.</Typography>;
   }
+
+  // if (!user || !user.infouser) {
+  //   return <Typography>Nu s-au putut încărca datele utilizatorului. Vă rugăm să încercați din nou mai târziu.</Typography>;
+  // }
 
   return (
     <div className={styles.diary}>
@@ -70,7 +91,7 @@ export default function Diary() {
           onChange={(e) => setNewProduct(e.target.value)}
           sx={{ mr: 1, minWidth: 200 }}
         >
-          {products.map((product) => (
+          {user.infouser.allowedProductsAll.map((product) => (
             <MenuItem key={product._id} value={product.title}>
               {product.title}
             </MenuItem>

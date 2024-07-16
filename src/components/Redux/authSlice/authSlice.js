@@ -84,6 +84,26 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+export const fetchUserData = createAsyncThunk(
+  'auth/fetchUserData',
+  async (_, thunkAPI) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token not found');
+      }
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      };
+      const response = await axios.get('/users/current', config);
+      return response.data;
+    } catch (error) {
+      console.error('Fetch user data error:', error);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch user data');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -138,13 +158,27 @@ const authSlice = createSlice({
         state.loading = false;
         state.status = 'succeeded';
         if (state.user) {
-          state.user = { ...state.user, ...action.payload.user };
+          state.user = { ...state.user, ...action.payload };
         }
         state.error = null;
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.status = 'failed';
+        state.error = action.payload;
+      })
+      .addCase(fetchUserData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isLoggedIn = true;
+        state.error = null;
+      })
+      .addCase(fetchUserData.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },

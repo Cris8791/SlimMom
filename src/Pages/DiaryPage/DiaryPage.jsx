@@ -32,7 +32,7 @@ export default function DiaryPage() {
             </Link>
           </li>
           <li>
-            <Link to="/calc" className={styles.link}>
+            <Link to="/calculator" className={styles.link}>
               <Typography sx={{ padding: '0', fontWeight: '700', fontSize: '14px', letterSpacing: '0.04em', textTransform: 'uppercase', color: ' #9b9faa' }}>
                 Calculator
               </Typography>

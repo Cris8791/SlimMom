@@ -19,13 +19,13 @@ export default function Calculator() {
     const [feedback, setFeedback] = useState('');
 
     useEffect(() => {
-        if (user) {
-            setHeight(user.height || '');
-            setAge(user.age || '');
-            setCurrentWeight(user.currentWeight || '');
-            setDesiredWeight(user.desiredWeight || '');
-            setBloodType(user.bloodType || '');
-        }
+      if (user) {
+        setHeight(user.height?.toString() || '');
+        setAge(user.age?.toString() || '');
+        setCurrentWeight(user.currentWeight?.toString() || '');
+        setDesiredWeight(user.desiredWeight?.toString() || '');
+        setBloodType(user.bloodType || '');
+      }
     }, [user]);
 
     useEffect(() => {
@@ -41,40 +41,42 @@ export default function Calculator() {
     }, [updateStatus, updateError, navigate]);
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!height || !age || !currentWeight || !desiredWeight || !bloodType) {
-            setFeedback('Toate câmpurile sunt obligatorii');
-            return;
+      event.preventDefault();
+      if (!height || !age || !currentWeight || !desiredWeight || !bloodType) {
+        setFeedback('Toate câmpurile sunt obligatorii');
+        return;
+      }
+
+      setFeedback('Se actualizează datele...');
+
+      const userData = {
+        currentWeight: parseFloat(currentWeight),
+        height: parseInt(height, 10),
+        age: parseInt(age, 10),
+        desiredWeight: parseFloat(desiredWeight),
+        bloodType
+      };
+
+      try {
+        const resultAction = await dispatch(updateUser(userData));
+        if (updateUser.fulfilled.match(resultAction)) {
+          setFeedback('Datele au fost actualizate cu succes!');
+          setTimeout(() => {
+            setFeedback('');
+            navigate('/diary');
+          }, 2000);
+        } else {
+          setFeedback(`Eroare la actualizarea datelor: ${resultAction.error.message}`);
         }
-
-        setFeedback('Se actualizează datele...');
-
-        const userData = {
-            currentWeight: parseFloat(currentWeight),
-            height: parseInt(height, 10),
-            age: parseInt(age, 10),
-            desiredWeight: parseFloat(desiredWeight),
-            bloodType
-        };
-
-        try {
-            const resultAction = await dispatch(updateUser(userData));
-            if (updateUser.fulfilled.match(resultAction)) {
-                console.log('Actualizare reușită:', resultAction.payload);
-                setFeedback('Datele au fost actualizate cu succes!');
-                setTimeout(() => {
-                    setFeedback('');
-                    navigate('/diary');
-                }, 2000);
-            } else {
-                console.error('Actualizare eșuată:', resultAction.error);
-                setFeedback(`Eroare la actualizarea datelor: ${resultAction.error.message}`);
-            }
-        } catch (error) {
-            console.error('Eroare la trimiterea acțiunii:', error);
-            setFeedback('A apărut o eroare. Vă rugăm să încercați din nou.');
-        }
+      } catch (error) {
+        setFeedback('A apărut o eroare. Vă rugăm să încercați din nou.');
+      }
     };
+
+    // În return:
+    <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+      {user && user.height ? 'Actualizează' : 'Start losing weight'}
+    </Button>
 
     return (
         <div className="calculator">
@@ -139,8 +141,8 @@ export default function Calculator() {
                         <MenuItem value="O">O</MenuItem>
                     </TextField>
                     <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                        {user && user.height ? 'Actualizează' : 'Start losing weight'}
-                    </Button>
+  {user && user.height ? 'Actualizează' : 'Start losing weight'}
+</Button>
                 </form>
                 {feedback && <Typography color="error" sx={{ mt: 2 }}>{feedback}</Typography>}
             </Box>
