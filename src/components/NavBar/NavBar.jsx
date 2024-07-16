@@ -1,12 +1,22 @@
-// Src/components/NavBar/NavBar.jsx
 import React from 'react';
 import css from './NavBar.module.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from '../Redux/authSlice/authSlice';
 import { Box, MenuList, Typography } from '@mui/material';
 import HorizontalRuleRoundedIcon from '@mui/icons-material/HorizontalRuleRounded';
 
 const NavBar = () => {
-  console.log("NavBar component rendered");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const user = useSelector(state => state.auth.user);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    navigate('/login');
+  };
+
   return (
     <div className={css.navbar}>
       <Box className={css.logo}>
@@ -31,49 +41,67 @@ const NavBar = () => {
         }}
       />
       <MenuList
-        sx={{
-          listStyle: 'none',
-          display: 'flex',
-          flexDirection: 'row',
-          gap: '20px',
-          padding: '0',
-        }}
-      >
-        <li>
-          <Link to="/login" className={css.link}>
-            <Typography
-              sx={{
-                padding: '0',
-                fontWeight: '700',
-                fontSize: '14px',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                color: ' #9b9faa',
-              }}
-            >
-              log in
-            </Typography>
-          </Link>
-        </li>
-        <li>
-          <Link to="/registration" className={css.link}>
-            <Typography
-              sx={{
-                padding: '0',
-                fontWeight: '700',
-                fontSize: '14px',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                color: ' #9b9faa',
-              }}
-            >
-              Registration
-            </Typography>
-          </Link>
-        </li>
-      </MenuList>
+  sx={{
+    listStyle: 'none',
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '20px',
+    padding: '0',
+  }}
+>
+  {isLoggedIn ? [
+    <li key="diary">
+      <Link to="/diary" className={css.link}>
+        <Typography sx={menuItemStyle}>
+          Diary
+        </Typography>
+      </Link>
+    </li>,
+    <li key="calculator">
+      <Link to="/calculator" className={css.link}>
+        <Typography sx={menuItemStyle}>
+          Calculator
+        </Typography>
+      </Link>
+    </li>,
+    <li key="username">
+      <Typography sx={menuItemStyle}>
+        {user?.name || 'User'}
+      </Typography>
+    </li>,
+    <li key="logout">
+      <Typography sx={menuItemStyle} onClick={handleLogout} style={{cursor: 'pointer'}}>
+        Logout
+      </Typography>
+    </li>
+  ] : [
+    <li key="login">
+      <Link to="/login" className={css.link}>
+        <Typography sx={menuItemStyle}>
+          Log in
+        </Typography>
+      </Link>
+    </li>,
+    <li key="registration">
+      <Link to="/registration" className={css.link}>
+        <Typography sx={menuItemStyle}>
+          Registration
+        </Typography>
+      </Link>
+    </li>
+  ]}
+</MenuList>
     </div>
   );
+};
+
+const menuItemStyle = {
+  padding: '0',
+  fontWeight: '700',
+  fontSize: '14px',
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  color: ' #9b9faa',
 };
 
 export default NavBar;

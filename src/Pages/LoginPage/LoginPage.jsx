@@ -9,7 +9,7 @@ import styles from './LoginPage.module.css';
 export default function LoginPage() {
   return (
     <div className={styles.loginpage}>
-      <NavBar />
+     
       <Login />
     </div>
   );

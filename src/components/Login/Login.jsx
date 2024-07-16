@@ -37,7 +37,8 @@ const Login = () => {
         if (token) {
           console.log('Token found:', token);
           localStorage.setItem('token', token);
-          if (user.height && user.currentWeight && user.desiredWeight && user.bloodType) {
+          // Verificăm dacă avem datele necesare pentru utilizator
+          if (user && user.height && user.currentWeight && user.desiredWeight && user.bloodType) {
             navigate('/diary');
           } else {
             navigate('/calculator');

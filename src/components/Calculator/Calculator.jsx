@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser, logoutUser } from '../Redux/authSlice/authSlice';
+import { updateUser } from '../Redux/authSlice/authSlice';
 import { Typography, Box, Button, TextField, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,8 +19,6 @@ export default function Calculator() {
     const [feedback, setFeedback] = useState('');
 
     useEffect(() => {
-        console.log('Current user state:', user);
-        console.log('Token from localStorage:', localStorage.getItem('token'));
         if (user) {
             setHeight(user.height || '');
             setAge(user.age || '');
@@ -31,13 +29,14 @@ export default function Calculator() {
     }, [user]);
 
     useEffect(() => {
-        console.log('Current update status:', updateStatus);
-        console.log('Current update error:', updateError);
         if (updateStatus === 'failed') {
             setFeedback(`Eroare la actualizarea datelor: ${updateError}`);
         } else if (updateStatus === 'succeeded') {
             setFeedback('Datele au fost actualizate cu succes!');
-            setTimeout(() => navigate('/diary'), 2000);
+            setTimeout(() => {
+                setFeedback('');
+                navigate('/diary');
+            }, 2000);
         }
     }, [updateStatus, updateError, navigate]);
 
@@ -58,14 +57,15 @@ export default function Calculator() {
             bloodType
         };
 
-        console.log('Trimit datele pentru actualizare:', userData);
-
         try {
             const resultAction = await dispatch(updateUser(userData));
             if (updateUser.fulfilled.match(resultAction)) {
                 console.log('Actualizare reușită:', resultAction.payload);
                 setFeedback('Datele au fost actualizate cu succes!');
-                setTimeout(() => navigate('/diary'), 2000);
+                setTimeout(() => {
+                    setFeedback('');
+                    navigate('/diary');
+                }, 2000);
             } else {
                 console.error('Actualizare eșuată:', resultAction.error);
                 setFeedback(`Eroare la actualizarea datelor: ${resultAction.error.message}`);
@@ -76,16 +76,11 @@ export default function Calculator() {
         }
     };
 
-    const handleLogout = () => {
-        dispatch(logoutUser());
-        navigate('/login');
-    };
-
     return (
         <div className="calculator">
             <Box sx={{ width: '100%', maxWidth: 500, bgcolor: 'background.paper', padding: 2 }}>
                 <Typography variant="h6" gutterBottom>
-                    Actualizează detaliile tale
+                    {user && user.height ? 'Actualizează detaliile tale' : 'Completează detaliile tale'}
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <TextField
@@ -144,13 +139,10 @@ export default function Calculator() {
                         <MenuItem value="O">O</MenuItem>
                     </TextField>
                     <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                        Salvează
+                        {user && user.height ? 'Actualizează' : 'Start losing weight'}
                     </Button>
                 </form>
                 {feedback && <Typography color="error" sx={{ mt: 2 }}>{feedback}</Typography>}
-                <Button variant="outlined" color="secondary" onClick={handleLogout} sx={{ mt: 2 }}>
-                    Deconectare
-                </Button>
             </Box>
         </div>
     );
