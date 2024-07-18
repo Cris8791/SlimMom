@@ -27,24 +27,17 @@ const Login = () => {
     setError(null);
 
     try {
-      const action = await dispatch(loginUser({ email, password }));
-      if (action.payload) {
-        const { token } = action.payload;
-        if (token) {
-          localStorage.setItem('token', token);
-          // Așteptăm încărcarea datelor utilizatorului înainte de a naviga
-          await dispatch(fetchUserData());
-          const user = action.payload;
-          if (user.height && user.currentWeight && user.desiredWeight && user.bloodType) {
-            navigate('/diary');
-          } else {
-            navigate('/calculator');
-          }
+      const loginResult = await dispatch(loginUser({ email, password })).unwrap();
+      if (loginResult.token) {
+        localStorage.setItem('token', loginResult.token);
+        const userDataResult = await dispatch(fetchUserData()).unwrap();
+        if (userDataResult.height && userDataResult.currentWeight && userDataResult.desiredWeight && userDataResult.bloodType) {
+          navigate('/diary');
         } else {
-          throw new Error('No token in response');
+          navigate('/calculator');
         }
-      } else if (action.error) {
-        throw new Error(action.error.message || 'Login failed');
+      } else {
+        throw new Error('No token in response');
       }
     } catch (err) {
       console.error('Login Error:', err);

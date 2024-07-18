@@ -12,9 +12,13 @@ const NavBar = () => {
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
   const user = useSelector(state => state.auth.user);
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate('/'); // Redirecționează către home page după logout
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -41,56 +45,56 @@ const NavBar = () => {
         }}
       />
       <MenuList
-  sx={{
-    listStyle: 'none',
-    display: 'flex',
-    flexDirection: 'row',
-    gap: '20px',
-    padding: '0',
-  }}
->
-  {isLoggedIn ? [
-    <li key="diary">
-      <Link to="/diary" className={css.link}>
-        <Typography sx={menuItemStyle}>
-          Diary
-        </Typography>
-      </Link>
-    </li>,
-    <li key="calculator">
-      <Link to="/calculator" className={css.link}>
-        <Typography sx={menuItemStyle}>
-          Calculator
-        </Typography>
-      </Link>
-    </li>,
-    <li key="username">
-      <Typography sx={menuItemStyle}>
-        {user?.name || 'User'}
-      </Typography>
-    </li>,
-    <li key="logout">
-      <Typography sx={menuItemStyle} onClick={handleLogout} style={{cursor: 'pointer'}}>
-        Logout
-      </Typography>
-    </li>
-  ] : [
-    <li key="login">
-      <Link to="/login" className={css.link}>
-        <Typography sx={menuItemStyle}>
-          Log in
-        </Typography>
-      </Link>
-    </li>,
-    <li key="registration">
-      <Link to="/registration" className={css.link}>
-        <Typography sx={menuItemStyle}>
-          Registration
-        </Typography>
-      </Link>
-    </li>
-  ]}
-</MenuList>
+        sx={{
+          listStyle: 'none',
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '20px',
+          padding: '0',
+        }}
+      >
+        {isLoggedIn ? [
+          <li key="diary">
+            <Link to="/diary" className={css.link}>
+              <Typography sx={menuItemStyle}>
+                Diary
+              </Typography>
+            </Link>
+          </li>,
+          <li key="calculator">
+            <Link to="/calculator" className={css.link}>
+              <Typography sx={menuItemStyle}>
+                Calculator
+              </Typography>
+            </Link>
+          </li>,
+          <li key="username">
+            <Typography sx={menuItemStyle}>
+              {user?.name || 'User'}
+            </Typography>
+          </li>,
+          <li key="logout">
+            <Typography sx={menuItemStyle} onClick={handleLogout} style={{cursor: 'pointer'}}>
+              Logout
+            </Typography>
+          </li>
+        ] : [
+          <li key="login">
+            <Link to="/login" className={css.link}>
+              <Typography sx={menuItemStyle}>
+                Log in
+              </Typography>
+            </Link>
+          </li>,
+          <li key="registration">
+            <Link to="/registration" className={css.link}>
+              <Typography sx={menuItemStyle}>
+                Registration
+              </Typography>
+            </Link>
+          </li>
+        ]}
+      </MenuList>
     </div>
   );
 };
